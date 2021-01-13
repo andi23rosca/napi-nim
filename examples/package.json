@@ -1,0 +1,11 @@
+{
+  "name": "examples",
+  "version": "1.0.0",
+  "description": "Node JS extenstion written in Nim",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "dependencies": {
+    "bindings": "^1.5.0"
+  }
+}

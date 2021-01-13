@@ -55,22 +55,12 @@ init proc(exports: Module) =
     echo "Hello world"`
 );
 
-let baseStyles = [
-  "color: #fff",
-  "background-color: #444",
-  "padding: 2px 4px",
-  "border-radius: 2px",
-].join(";");
-
-console.log(
-  `%cProject created successfuly.
-
-Next steps:
-cd ${projectName}
-napi-nim main.nim
-node --napi-modules index.js
-`,
-  baseStyles
+fs.writeFileSync(
+  path.resolve(projectDir, ".gitignore"),
+  `node_modules
+nimcache
+build
+binding.gyp`
 );
 
 console.log("%s Project ready.", chalk.green.bold("DONE"));

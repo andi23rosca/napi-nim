@@ -1,0 +1,4 @@
+node_modules
+nimcache
+build
+binding.gyp

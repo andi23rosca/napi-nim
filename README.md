@@ -8,7 +8,7 @@ Since we're building a NodeJS extension in Nim you should install both from:
 Make sure you have `node-gyp` installed globally by doing `npm i -g node-gyp`.
 
 ## Installation
-Install napi-nim globally
+Install `napi-nim` globally
 ```
 npm i -g napi-nim
 ```
@@ -40,7 +40,7 @@ Next up, follow the next steps outlined in the output:
 
 1. `cd hello-world` to navigate to the project directory.
 2. `napi-nim main.nim` will compile the Nim file to a C file, and then use `node-gyp` to build the final NodeJS add-on.
-3. `node --napi-modules index.js` will run the JS file. the --napi-modules flag ensures that node knows to look for a n-api add-on.
+3. `node --napi-modules index.js` will run the JS file. the `--napi-modules` flag ensures that node knows to look for a n-api add-on.
 
 
 Running the last command should output `Hello world` in the command line.
