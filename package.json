@@ -19,6 +19,7 @@
   "license": "ISC",
   "dependencies": {
     "chalk": "^4.1.0",
-    "esm": "^3.2.25"
+    "esm": "^3.2.25",
+    "which": "^2.0.2"
   }
 }

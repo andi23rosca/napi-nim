@@ -1,6 +1,7 @@
-const { basename, dirname, resolve, join } = require("path");
-const { argv, env } = require("process");
-const { writeFileSync } = require("fs");
+const { basename, dirname, resolve, join, sep } = require("path");
+const { argv } = require("process");
+const which = require("which");
+const { writeFileSync, realpathSync } = require("fs");
 const { executeCmd } = require("./helpers/executeCmd");
 const { pretty } = require("./helpers/pretty");
 
@@ -11,9 +12,16 @@ const entryName = basename(entryFilePath, ".nim");
 const entryDirectory = dirname(entryFilePath);
 
 /**
- *
+ * Pretty ugly code but it finds the nim lib folder that will need
+ * to included when building the extension.
  */
-const nimbase = "/usr/local/Cellar/nim/1.4.2/nim/lib"; //env.NIM_LIB_PATH;
+let nimbase = dirname(realpathSync(which.sync("nim"))).split(sep);
+nimbase.splice(nimbase.length - 2, 2, "nim", "lib");
+if(nimbase[0] === "") {
+  nimbase.splice(0, 1);
+  nimbase[0] = `/${nimbase[0]}`;
+}
+nimbase = resolve(...nimbase);
 /**
  * Path to where the nim cache folder will be.
  * Keeping it in the same directory makes building easier.
