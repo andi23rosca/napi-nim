@@ -1,6 +1,7 @@
 const { argv } = require("process");
 const fs = require("fs");
 const path = require("path");
+const chalk = require("chalk");
 const { executeCmd } = require("./helpers/executeCmd");
 const { pretty } = require("./helpers/pretty");
 
@@ -49,7 +50,35 @@ addon.hello();`
 fs.writeFileSync(
   path.resolve(projectDir, "main.nim"),
   `import ./napi/napibindings
-init proc(exports: Module) = 
+init proc(exports: Module) =
   exports.registerFn(0, "hello"):
     echo "Hello world"`
+);
+
+let baseStyles = [
+  "color: #fff",
+  "background-color: #444",
+  "padding: 2px 4px",
+  "border-radius: 2px",
+].join(";");
+
+console.log(
+  `%cProject created successfuly.
+
+Next steps:
+cd ${projectName}
+napi-nim main.nim
+node --napi-modules index.js
+`,
+  baseStyles
+);
+
+console.log("%s Project ready.", chalk.green.bold("DONE"));
+console.log("\nTest that it works by buildding and running:");
+console.log(
+  chalk.cyanBright.bold(
+    `  cd ${projectName}
+  napi-nim main.nim
+  node --napi-modules index.js`
+  )
 );
