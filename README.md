@@ -1,7 +1,9 @@
 # Write NodeJS native extensions in Nim
 
 ## Prerequisites
-Since we're building a NodeJS extension in Nim you should install both NodeJS from [here]("https://nodejs.org/en/") and Nim from [here]("https://nim-lang.org/install.html").
+Since we're building a NodeJS extension in Nim you should install both from:
+- NodeJS:  https://nodejs.org/en/
+- Nim:     https://nim-lang.org/install.html
 
 Make sure you have `node-gyp` installed globally by doing `npm i -g node-gyp`.
 
