@@ -74,7 +74,7 @@ node --napi-modules index.js
 );
 
 console.log("%s Project ready.", chalk.green.bold("DONE"));
-console.log("\nTest that it works by buildding and running:");
+console.log("\nTest that it works by building and running:");
 console.log(
   chalk.cyanBright.bold(
     `  cd ${projectName}
