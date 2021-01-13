@@ -45,6 +45,78 @@ Next up, follow the next steps outlined in the output:
 
 Running the last command should output `Hello world` in the command line.
 
+## API
+`napi-nim` provides a high level API over the classic `n-api`.
+This readme might be incomplete, to see all available high level APIs see `napi/napibindings.nim`.
+
+### Defining a module
+The `init` macro will help you define a module initialization proc.
+The proc definition following it should accept an argument of the type `Module`.
+```nim
+init proc(module: Module) =
+```
+
+### Registering module exports
+For exporting properties and functions there are 2 separate templates to use.
+```nim
+init proc(module: Module) =
+  # equivalent to module.exports.hello = function () ....
+  module.registerFn(0, "hello"):
+    echo "hello world"
+
+  # equivalent to module.exports.num = 23
+  module.register("num", 23)
+```
+
+### Converting between `napi_value` and Nim types
+The node api defines the type `napi_value` which can take the value of the JS types such as number, string, object, etc.
+For you to be able to translate between JS types and Nim types and vice-versa, `napi-nim` exposes a few helpers.
+
+#### napi_value -> Nim
+```nim
+jsString.getStr # to get the string equivalent
+jsNumber.getInt # to convert a js number to int, getInt32/64 and getFloat32/64 are also available
+```
+See the rest in `napi/napibindings.nim`.
+
+#### Nim -> napi_value
+Use the `%*` operator to convert Nim types to JS.
+Make sure there's an empty space between the operator and the definition.
+```nim
+let obj = %* {"someProp": 23}
+```
+
+### Function with arguments
+When registering a function, the first argument should be the number of arguments you expect for it.
+
+You can get the arguments from the `args` array that is made available by `registerFn`. Keep in mind the arguments you receive will be JS types so you have to convert to Nim types if you want to use them.
+```nim
+module.registerFn(1, "hello"):
+  let toGreet = args[0].getStr; # Getting the first and only argument as a string
+  echo "Hello " & toGreet
+```
+
+## Low level API
+For the things that the high level API might not support yet there's the option to use the lower level functions and types provided
+by the node_api header.
+You can see in the rest of the files in `napi` like `napi/jsNativeApi.nim` the wrappers which are just Nim type definitions equivalent to the header files from the n-api.
+
+Check the original docs here: https://nodejs.org/api/n-api.html#n_api_basic_n_api_data_types
+
+One function to mention is `assessStatus`. It checks that a low level api function returns a success, and if not throws an error.
+You could also use `discard` instead to ignore the returned status, but it's not recommended.
+
+```nim
+var
+  obj: napi_value
+  value: napi_value
+assessStatus module.env.napi_create_string_utf8("level", 5, addr value) # create a js string and put it in value
+assessStatus module.env.napi_create_object(addr lowObj); # create a js object and put it in obj
+assessStatus module.env.napi_set_named_property(obj, "low", value) # Set the property low to be the value string
+```
+
+
+
 ## Roadmap
 The project is still new and unfinished.
 It can already be used to create add-ons but it is missing the following features/nice-to-haves:
