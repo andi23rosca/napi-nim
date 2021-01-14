@@ -16,7 +16,7 @@ const entryDirectory = dirname(entryFilePath);
  * to included when building the extension.
  */
 let nimbase = dirname(realpathSync(which.sync("nim"))).split(sep);
-nimbase.splice(nimbase.length - 2, 2, "nim", "lib");
+nimbase[nimbase.length-1] = "lib";
 if(nimbase[0] === "") {
   nimbase.splice(0, 1);
   nimbase[0] = `/${nimbase[0]}`;
