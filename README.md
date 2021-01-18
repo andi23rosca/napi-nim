@@ -1,3 +1,8 @@
+# Write NodeJS native extensions in Nim
+Since the release of the `n-api` which lets you call native code easily from NodeJS, many languages which support interfacing with C can now directly communicate with JavaScript. [Nim](https://nim-lang.org/) is a language that values efficiency above all else, but provides a lot of high level constructs and niceties for developer productivity.
+
+If you don't like the verbosity of C code and feel that C++ is too complex, then try to improve the performance of your NodeJS apps with `napi-nim`.
+
 - [Write NodeJS native extensions in Nim](#write-nodejs-native-extensions-in-nim)
   * [Prerequisites](#prerequisites)
   * [Installation](#installation)
@@ -11,15 +16,16 @@
     + [Function with arguments](#function-with-arguments)
   * [Low level API](#low-level-api)
   * [Roadmap](#roadmap)
-  
-# Write NodeJS native extensions in Nim
 
 ## Prerequisites
 Since we're building a NodeJS extension in Nim you should install both from:
 - NodeJS:  https://nodejs.org/en/
 - Nim:     https://nim-lang.org/install.html
 
-Make sure you have `node-gyp` installed globally by doing `npm i -g node-gyp`.
+Make sure you have `node-gyp` installed globally by doing 
+```
+npm i -g node-gyp
+```
 
 ## Installation
 Install `napi-nim` globally
