@@ -1,7 +1,7 @@
 # Write NodeJS native extensions in Nim
-Since the release of the `n-api` which lets you call native code easily from NodeJS, many languages which support interfacing with C can now directly communicate with JavaScript. [Nim](https://nim-lang.org/) is a language that values efficiency above all else, but provides a lot of high level constructs and niceties for developer productivity.
-
 If you don't like the verbosity of C code and feel that C++ is too complex, then try to improve the performance of your NodeJS apps with `napi-nim`.
+
+The new `n-api` which is now part of NodeJS lets you interface with JavaScript code from any language that supports the C ABI. [Nim](https://nim-lang.org/) is a language that values efficiency above all else, but provides a lot of high level constructs and niceties for developer productivity, making it a very suitable choice for writing performant add-ons to your NodeJS code.
 
 - [Write NodeJS native extensions in Nim](#write-nodejs-native-extensions-in-nim)
   * [Prerequisites](#prerequisites)
