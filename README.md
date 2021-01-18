@@ -1,3 +1,17 @@
+- [Write NodeJS native extensions in Nim](#write-nodejs-native-extensions-in-nim)
+  * [Prerequisites](#prerequisites)
+  * [Installation](#installation)
+  * [Basic usage](#basic-usage)
+  * [API](#api)
+    + [Defining a module](#defining-a-module)
+    + [Registering module exports](#registering-module-exports)
+    + [Converting between `napi_value` and Nim types](#converting-between--napi-value--and-nim-types)
+      - [napi_value -> Nim](#napi-value----nim)
+      - [Nim -> napi_value](#nim----napi-value)
+    + [Function with arguments](#function-with-arguments)
+  * [Low level API](#low-level-api)
+  * [Roadmap](#roadmap)
+  
 # Write NodeJS native extensions in Nim
 
 ## Prerequisites
@@ -125,3 +139,5 @@ It can already be used to create add-ons but it is missing the following feature
 - [ ] In-depth explanation of the code-base.
 - [ ] Collaboration guide.
 - [ ] `napi-nim init` should include bundling and publishing an add-on out of the box. (Right now you have to figure it out yourself 😕)
+
+Credit to https://github.com/AjBreidenbach/napibindings which this project is heavily based on. I opted for a new repository instead of PR since it seems that the project is completely abandoned.
