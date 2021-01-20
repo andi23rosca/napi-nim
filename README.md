@@ -1,11 +1,31 @@
 # Write NodeJS native extensions in Nim
+If you don't like the verbosity of C code and feel that C++ is too complex, then try to improve the performance of your NodeJS apps with `napi-nim`.
+
+The new `n-api` which is now part of NodeJS lets you interface with JavaScript code from any language that supports the C ABI. [Nim](https://nim-lang.org/) is a language that values efficiency above all else, but provides a lot of high level constructs and niceties for developer productivity, making it a very suitable choice for writing performant add-ons to your NodeJS code.
+
+- [Write NodeJS native extensions in Nim](#write-nodejs-native-extensions-in-nim)
+  * [Prerequisites](#prerequisites)
+  * [Installation](#installation)
+  * [Basic usage](#basic-usage)
+  * [API](#api)
+    + [Defining a module](#defining-a-module)
+    + [Registering module exports](#registering-module-exports)
+    + [Converting between `napi_value` and Nim types](#converting-between--napi-value--and-nim-types)
+      - [napi_value -> Nim](#napi-value----nim)
+      - [Nim -> napi_value](#nim----napi-value)
+    + [Function with arguments](#function-with-arguments)
+  * [Low level API](#low-level-api)
+  * [Roadmap](#roadmap)
 
 ## Prerequisites
 Since we're building a NodeJS extension in Nim you should install both from:
 - NodeJS:  https://nodejs.org/en/
 - Nim:     https://nim-lang.org/install.html
 
-Make sure you have `node-gyp` installed globally by doing `npm i -g node-gyp`.
+Make sure you have `node-gyp` installed globally by doing 
+```
+npm i -g node-gyp
+```
 
 ## Installation
 Install `napi-nim` globally
@@ -125,3 +145,5 @@ It can already be used to create add-ons but it is missing the following feature
 - [ ] In-depth explanation of the code-base.
 - [ ] Collaboration guide.
 - [ ] `napi-nim init` should include bundling and publishing an add-on out of the box. (Right now you have to figure it out yourself 😕)
+
+Credit to https://github.com/AjBreidenbach/napibindings which this project is heavily based on. I opted for a new repository instead of PR since it seems that the project is completely abandoned.
