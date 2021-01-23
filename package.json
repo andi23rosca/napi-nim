@@ -1,6 +1,6 @@
 {
   "name": "napi-nim",
-  "version": "1.0.7umpe",
+  "version": "1.0.7",
   "description": "",
   "main": "src/index.js",
   "repository": {
