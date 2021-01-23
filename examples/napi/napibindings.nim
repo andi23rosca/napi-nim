@@ -319,11 +319,6 @@ proc defineProperties*(obj: Module) =
 
 
 
-
-
-
-
-
 proc napiCreate*[T](t: T): napi_value =
   `env$`.create(t)
 
@@ -344,6 +339,12 @@ proc toNapiValue(x: NimNode): NimNode {.compiletime.} =
 
 macro `%*`*(x: untyped): untyped =
   return toNapiValue(x)
+
+iterator items*(n: napi_value): napi_value =
+  if not n.isArray: raise newException(ValueError, "value is not an array")
+  for index in 0..<n.len:
+    yield n[index]
+
 
 macro init*(initHook: proc(exports: Module)): void =
   ##Bootstraps module; use by calling ``register`` to add properties to ``exports``
