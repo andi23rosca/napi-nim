@@ -135,16 +135,14 @@ proc getBool*(n: napi_value, default: bool): bool =
   except: result = default
 
 
-proc getStr*(n: napi_value, bufsize: int = 40): string =
-  ##Retrieves utf8 encoded value from node; raises exception on failure
-  ##
-  ##Maximum return string length is equal to ``bufsize``
-  var
-    buf = cast[cstring](alloc(bufsize))
-    res: csize_t
+proc getStr*(n: napi_value): string =
+  var bufSize: csize_t
+  assessStatus napi_get_value_string_utf8(`env$`, n, cast[cstring](nil), cast[csize_t](nil), addr bufSize)
 
-  assessStatus napi_get_value_string_utf8(`env$`, n, buf, bufsize.csize_t, addr res)
-  return  ($buf)[0..res-1]
+  var buf = cast[cstring](alloc(bufSize + 1))
+  defer: dealloc(buf)
+  assessStatus napi_get_value_string_utf8(`env$`, n, buf, bufSize + 1, addr bufSize)
+  return $buf
 
 proc getStr*(n: napi_value, default: string, bufsize: int = 40): string =
   ##Retrieves utf8 encoded value from node; returns default on failure
@@ -152,7 +150,7 @@ proc getStr*(n: napi_value, default: string, bufsize: int = 40): string =
   var
     buf = cast[cstring](alloc(bufsize))
     res: csize_t
-
+  defer: dealloc(buf)
   try:
     assessStatus napi_get_value_string_utf8(`env$`, n, buf, bufsize.csize_t, addr res)
     result = ($buf)[0..res-1]
