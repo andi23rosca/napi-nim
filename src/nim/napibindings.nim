@@ -15,7 +15,7 @@ var `env$`*: napi_env = nil
 
 
 proc assessStatus*(status: NapiStatus) {.raises: [NapiStatusError].} =
-  ##Asserts that a call returns correctly; 
+  ##Asserts that a call returns correctly;
   if status != napi_ok:
     raise newException(NapiStatusError, "NAPI call returned non-zero status (" & $status & ": " & $NapiStatus(status) & ")")
 
@@ -36,6 +36,8 @@ proc kind(env: napi_env, val: napi_value): NapiValueType =
 
 
 
+proc create(env: napi_env, n: bool): napi_value =
+  assessStatus (napi_get_boolean(env, n, addr result))
 
 proc create(env: napi_env, n: int32): napi_value =
   assessStatus ( napi_create_int32(env, n, addr result) )
@@ -133,24 +135,22 @@ proc getBool*(n: napi_value, default: bool): bool =
   except: result = default
 
 
-proc getStr*(n: napi_value, bufsize: int = 40): string =
-  ##Retrieves utf8 encoded value from node; raises exception on failure
-  ##
-  ##Maximum return string length is equal to ``bufsize``
-  var 
-    buf = cast[cstring](alloc(bufsize))
-    res: csize_t
-
-  assessStatus napi_get_value_string_utf8(`env$`, n, buf, bufsize.csize_t, addr res)
-  return  ($buf)[0..res-1]
+proc getStr*(n: napi_value): string =
+  var bufSize: csize_t
+  assessStatus napi_get_value_string_utf8(`env$`, n, cast[cstring](nil), cast[csize_t](nil), addr bufSize)
+  bufSize += 1
+  var buf = cast[cstring](alloc(bufSize))
+  defer: dealloc(buf)
+  assessStatus napi_get_value_string_utf8(`env$`, n, buf, bufSize, addr bufSize)
+  return $buf
 
 proc getStr*(n: napi_value, default: string, bufsize: int = 40): string =
   ##Retrieves utf8 encoded value from node; returns default on failure
   ##Maximum return string length is equal to ``bufsize``
-  var 
+  var
     buf = cast[cstring](alloc(bufsize))
     res: csize_t
-
+  defer: dealloc(buf)
   try:
     assessStatus napi_get_value_string_utf8(`env$`, n, buf, bufsize.csize_t, addr res)
     result = ($buf)[0..res-1]
@@ -209,6 +209,10 @@ proc setElement*(obj: napi_value, index: int, value: napi_value) =
   if not isArray(obj): raise newException(ValueError, "value is not an array")
   assessStatus napi_set_element(`env$`, obj, uint32 index, value)
 
+proc len*(arr: napi_value): int =
+  if not isArray(arr): raise newException(ValueError, "value is not an array")
+  arr.getProperty("length").getInt
+
 proc `[]`*(obj: napi_value, index: int): napi_value =
   ##Alias for ``getElement``; raises exception
   obj.getElement(index)
@@ -216,17 +220,17 @@ proc `[]=`*(obj: napi_value, index: int, value: napi_value) =
   ##Alias for ``setElement``; raises exception
   obj.setElement(index, value)
 
-proc null*: napi_value =
+proc getNull*: napi_value =
   ##Returns JavaScript ``null`` value
   assessStatus napi_get_null(`env$`, addr result)
 
-proc undefined*: napi_value =
+proc getUndefined*: napi_value =
   ##Returns JavaScript ``undefined`` value
   assessStatus napi_get_undefined(`env$`, addr result)
 
-
-
-
+proc getGlobal*: napi_value =
+  ##Returns NodeJS global variable
+  assessStatus napi_get_global(`env$`, addr result)
 
 proc registerBase(obj: Module, name: string, value: napi_value, attr: int) =
   obj.descriptors.add(
@@ -267,6 +271,9 @@ const emptyArr: array[0, (string, napi_value)] = []
 proc callFunction*(fn: napi_value, args: openarray[napi_value] = [], this = %emptyArr): napi_value =
   assessStatus napi_call_function(`env$`, this, fn, args.len.csize_t, cast[ptr napi_value](args.toUnchecked()), addr result)
 
+proc callMethod*(instance: napi_value, methd: string, args: openarray[napi_value] = []): napi_value =
+  assessStatus napi_call_function(`env$`, instance, instance.getProperty(methd), args.len.csize_t, cast[ptr napi_value](args.toUnchecked()), addr result)
+
 template getIdentStr*(n: untyped): string = $n
 
 
@@ -274,7 +281,7 @@ template fn*(paramCt: int, name, cushy: untyped): untyped {.dirty.} =
   var name {.inject.}: napi_value
   block:
     proc `wrapper$`(environment: napi_env, info: napi_callback_info): napi_value {.cdecl.} =
-      var 
+      var
         `argv$` = cast[ptr UncheckedArray[napi_value]](alloc(paramCt * sizeof(napi_value)))
         argc: csize_t = paramCt
         this: napi_value
@@ -292,7 +299,7 @@ template fn*(paramCt: int, name, cushy: untyped): untyped {.dirty.} =
 template registerFn*(exports: Module, paramCt: int, name: string, cushy: untyped): untyped {.dirty.}=
   block:
     proc `wrapper$`(environment: napi_env, info: napi_callback_info): napi_value {.cdecl.} =
-      var 
+      var
         `argv$` = cast[ptr UncheckedArray[napi_value]](alloc(paramCt * sizeof(napi_value)))
         argc: csize_t = paramCt
         this: napi_value
@@ -309,11 +316,6 @@ template registerFn*(exports: Module, paramCt: int, name: string, cushy: untyped
 
 proc defineProperties*(obj: Module) =
   assessStatus napi_define_properties(obj.env, obj.val, obj.descriptors.len.csize_t, cast[ptr NapiPropertyDescriptor](obj.descriptors.toUnchecked))
-
-
-
-
-
 
 
 
@@ -337,6 +339,12 @@ proc toNapiValue(x: NimNode): NimNode {.compiletime.} =
 
 macro `%*`*(x: untyped): untyped =
   return toNapiValue(x)
+
+iterator items*(n: napi_value): napi_value =
+  if not n.isArray: raise newException(ValueError, "value is not an array")
+  for index in 0..<n.len:
+    yield n[index]
+
 
 macro init*(initHook: proc(exports: Module)): void =
   ##Bootstraps module; use by calling ``register`` to add properties to ``exports``
